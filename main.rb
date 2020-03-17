@@ -5,7 +5,7 @@ $window_size = 650   #height = 650, width = 600
 mesBox_title = 'Matrix resolution'.freeze
 
 available_sizes = [10,12,20,24,30,40,50,100,150,200]
-time_sleep_betw_loops = [0.3,0.6,1,1.5,2,3,5]
+time_sleep_betw_loops = [0.6,1,1.5,2,3,5]
 
 root = TkRoot.new{
     title "Game of life"
@@ -77,12 +77,9 @@ root = TkRoot.new{
        )
   end
 
-
-
   canvas = TkCanvas.new(root) do
      place(height: $window_size - 50 , width: $window_size-50, x: 0, y: 50)
   end
-
 
   start_pause_btn = TkButton.new(root) do
          background  "green3"
@@ -95,8 +92,7 @@ root = TkRoot.new{
        end
   $start_pause_btn_pressed = false
 
-
-    stop_btn = TkButton.new(root) do
+  stop_btn = TkButton.new(root) do
            background  "gray19"
            text 'Reset'
            foreground  "white"
@@ -104,7 +100,6 @@ root = TkRoot.new{
            font myFont
            place(height: 30, width: 70, x: 95, y: 8)
          end
-
 
           # DRAW NEW MATRIX
   draw_new_matrix = lambda do |previos_m,its_after_increase|
@@ -140,7 +135,6 @@ root = TkRoot.new{
   end
 
   end
-
 
   save_state_of_map_after_resize = lambda do |its_after_increase|
     if start_pause_btn.state == 'normal'
@@ -227,22 +221,19 @@ root = TkRoot.new{
   stop_btn.command (
           ->() do
                     canvas.delete("all")
+                    $t.exit
                     elements_conf_normal_state.call
                     draw_new_matrix.call([],nil)
                     start_pause_btn.configure('state', 'disabled')
                     stop_btn.configure('disabled')
                     $start_pause_btn_pressed = false
-
-
               end
          )
-
 
   def is_need_to_resize?
       # if 3-neighbors-cell in bottom, top row; right, left column
     $math_matrix[0].each{|e| return true if e==3}
     $math_matrix[-1].each{|e| return true if e==3}
-
     for i in (0...$math_matrix.size)
       if $math_matrix[i][0] == 3 || $math_matrix[i][-1] == 3
            return true
@@ -260,15 +251,10 @@ root = TkRoot.new{
                     canvas.configure('state','disabled')
                     increase_btn.configure('state', 'disabled')
                     reduce_btn.configure('state', 'disabled')
-
-
-                    $t = Thread.new {
-
+                    $t = Thread.new{
                       loop do
-                          # sleep(var_time_sleep.value.to_f)
-
+                          sleep(var_time_sleep.value.to_f/3)
                           $math_matrix = Array.new(var_size.value.to_i+2){Array.new(var_size.value.to_i+2){0}}
-
                               #neighbors count for each cell set
                           $cells_matrix.each_with_index do |col,idx|
                             col.each_with_index do |cell, idy|
@@ -284,14 +270,10 @@ root = TkRoot.new{
                               end
                             end
                           end
-
                           if is_need_to_resize?
                             inc_matrix.call
                             next
                           end
-
-
-
                           $math_matrix[1..-2].each_with_index do |row,idy|
                             row[1..-2].each_with_index do |cell,idx|
                               if $cells_matrix[idx][idy].fill == 'gray74'
@@ -301,43 +283,12 @@ root = TkRoot.new{
                               end
                             end
                           end
-                    end
-                     }
-                    #
-                    #  $t.join
-
-
-                    # $t.wakeup
+                    end}
                   else
                       $t.exit
                       elements_conf_normal_state.call
                   end
-
-
               end
          )
-
-
-
-
-
-
-
-
-
     draw_new_matrix.call([],nil)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   Tk.mainloop()
